@@ -427,9 +427,18 @@
       "short": "DEFENCE",
       "sector": true,
       "nse": "NIFTY INDIA DEFENCE",
-      "symbols": [],
+      "symbols": [
+        "MODEFENCE.NS",
+        "GROWWDEF.NS",
+        "DEFENCEBEES.NS",
+        "DEFENCEIETF.NS",
+        "MOD1.NS"
+      ],
       "search": [
-        "Nifty India Defence ETF"
+        "Motilal Oswal Nifty India Defence ETF",
+        "Groww Nifty India Defence ETF",
+        "Nifty India Defence ETF",
+        "Nifty India Defence Index Fund"
       ],
       "constituents": [
         "HAL.NS",
