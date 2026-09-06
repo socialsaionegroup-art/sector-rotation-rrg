@@ -177,7 +177,13 @@
         "NHPC.NS",
         "JSWENERGY.NS",
         "TORNTPOWER.NS",
-        "SJVN.NS"
+        "SJVN.NS",
+        "PETRONET.NS",
+        "IGL.NS",
+        "MGL.NS",
+        "GUJGASLTD.NS",
+        "NLCINDIA.NS",
+        "CASTROLIND.NS"
       ]
     },
     {
@@ -399,10 +405,10 @@
     },
     {
       "id": "SMALLCAP",
-      "name": "Nifty Smallcap 100",
-      "short": "SMLCAP",
+      "name": "Nifty Smallcap 250",
+      "short": "SML250",
       "sector": true,
-      "nse": "NIFTY SMLCAP 100",
+      "nse": "NIFTY SMALLCAP 250",
       "symbols": [
         "MOSMALL250.NS",
         "NIFTYSMLCAP250.NS",
