@@ -131,6 +131,19 @@
       "search": [
         "Nifty Realty index",
         "Nifty Realty ETF"
+      ],
+      "constituents": [
+        "DLF.NS",
+        "LODHA.NS",
+        "GODREJPROP.NS",
+        "OBEROIRLTY.NS",
+        "PHOENIXLTD.NS",
+        "PRESTIGE.NS",
+        "BRIGADE.NS",
+        "ANANTRAJ.NS",
+        "SOBHA.NS",
+        "MAHLIFE.NS",
+        "SUNTECK.NS"
       ]
     },
     {
@@ -145,6 +158,26 @@
       "search": [
         "Nifty Energy ETF",
         "Nifty Energy index"
+      ],
+      "constituents": [
+        "RELIANCE.NS",
+        "ONGC.NS",
+        "NTPC.NS",
+        "POWERGRID.NS",
+        "COALINDIA.NS",
+        "BPCL.NS",
+        "IOC.NS",
+        "GAIL.NS",
+        "TATAPOWER.NS",
+        "ADANIGREEN.NS",
+        "ADANIENSOL.NS",
+        "ADANIPOWER.NS",
+        "HINDPETRO.NS",
+        "OIL.NS",
+        "NHPC.NS",
+        "JSWENERGY.NS",
+        "TORNTPOWER.NS",
+        "SJVN.NS"
       ]
     },
     {
@@ -159,6 +192,20 @@
       "search": [
         "Nifty Media index",
         "Nifty Media ETF"
+      ],
+      "constituents": [
+        "ZEEL.NS",
+        "SUNTV.NS",
+        "PVRINOX.NS",
+        "NAZARA.NS",
+        "SAREGAMA.NS",
+        "TIPSMUSIC.NS",
+        "NETWORK18.NS",
+        "TV18BRDCST.NS",
+        "DISHTV.NS",
+        "HATHWAY.NS",
+        "DBCORP.NS",
+        "JAGRAN.NS"
       ]
     },
     {
@@ -209,6 +256,36 @@
       "search": [
         "Nifty PSE ETF",
         "Nifty PSE index"
+      ],
+      "constituents": [
+        "ONGC.NS",
+        "NTPC.NS",
+        "POWERGRID.NS",
+        "COALINDIA.NS",
+        "BEL.NS",
+        "HAL.NS",
+        "IOC.NS",
+        "BPCL.NS",
+        "GAIL.NS",
+        "SAIL.NS",
+        "NMDC.NS",
+        "NHPC.NS",
+        "OIL.NS",
+        "RECLTD.NS",
+        "PFC.NS",
+        "IRCTC.NS",
+        "IRFC.NS",
+        "CONCOR.NS",
+        "BHEL.NS",
+        "NBCC.NS",
+        "RVNL.NS",
+        "MAZDOCK.NS",
+        "BEML.NS",
+        "SJVN.NS",
+        "HINDPETRO.NS",
+        "CANBK.NS",
+        "BANKBARODA.NS",
+        "PNB.NS"
       ]
     },
     {
@@ -233,6 +310,35 @@
       ],
       "search": [
         "Nifty Commodities index"
+      ],
+      "constituents": [
+        "RELIANCE.NS",
+        "ONGC.NS",
+        "COALINDIA.NS",
+        "TATASTEEL.NS",
+        "JSWSTEEL.NS",
+        "HINDALCO.NS",
+        "ULTRACEMCO.NS",
+        "GRASIM.NS",
+        "SHREECEM.NS",
+        "AMBUJACEM.NS",
+        "ACC.NS",
+        "UPL.NS",
+        "PIIND.NS",
+        "SRF.NS",
+        "TATACHEM.NS",
+        "VEDL.NS",
+        "JINDALSTEL.NS",
+        "NMDC.NS",
+        "SAIL.NS",
+        "IOC.NS",
+        "BPCL.NS",
+        "GAIL.NS",
+        "HINDPETRO.NS",
+        "ADANIENT.NS",
+        "APLAPOLLO.NS",
+        "JSWENERGY.NS",
+        "DALBHARAT.NS"
       ]
     },
     {
@@ -258,6 +364,23 @@
       "search": [
         "Nifty Consumer Durables ETF",
         "Nifty India Consumer Durables"
+      ],
+      "constituents": [
+        "TITAN.NS",
+        "HAVELLS.NS",
+        "VOLTAS.NS",
+        "DIXON.NS",
+        "CROMPTON.NS",
+        "BLUESTARCO.NS",
+        "BATAINDIA.NS",
+        "KAJARIACER.NS",
+        "CERA.NS",
+        "WHIRLPOOL.NS",
+        "AMBER.NS",
+        "VGUARD.NS",
+        "RAJESHEXPO.NS",
+        "TTKPRESTIG.NS",
+        "KALYANKJIL.NS"
       ]
     },
     {
@@ -281,11 +404,15 @@
       "sector": true,
       "nse": "NIFTY SMLCAP 100",
       "symbols": [
-        "^CNXSC"
+        "MOSMALL250.NS",
+        "NIFTYSMLCAP250.NS",
+        "SMALLCAP.NS",
+        "HDFCSML250.NS",
+        "ICICISMAL.NS"
       ],
       "search": [
         "Nifty Smallcap 250 ETF",
-        "Nifty Smallcap 100 index"
+        "Nifty Smallcap 250 index fund"
       ]
     },
     {
@@ -297,6 +424,23 @@
       "symbols": [],
       "search": [
         "Nifty India Defence ETF"
+      ],
+      "constituents": [
+        "HAL.NS",
+        "BEL.NS",
+        "BDL.NS",
+        "MAZDOCK.NS",
+        "SOLARINDS.NS",
+        "BEML.NS",
+        "COCHINSHIP.NS",
+        "DATAPATTNS.NS",
+        "ZENTEC.NS",
+        "PARAS.NS",
+        "ASTRAMICRO.NS",
+        "IDEAFORGE.NS",
+        "GRSE.NS",
+        "MTARTECH.NS",
+        "DYNAMATECH.NS"
       ]
     },
     {
@@ -309,6 +453,24 @@
       "search": [
         "Nifty Chemicals index",
         "Nifty Chemicals ETF"
+      ],
+      "constituents": [
+        "PIDILITIND.NS",
+        "SRF.NS",
+        "UPL.NS",
+        "PIIND.NS",
+        "DEEPAKNTR.NS",
+        "AARTIIND.NS",
+        "NAVINFLUOR.NS",
+        "ATUL.NS",
+        "VINATIORGA.NS",
+        "FLUOROCHEM.NS",
+        "TATACHEM.NS",
+        "LINDEINDIA.NS",
+        "SOLARINDS.NS",
+        "COROMANDEL.NS",
+        "CHAMBLFERT.NS",
+        "BASF.NS"
       ]
     },
     {
@@ -321,6 +483,22 @@
       "search": [
         "Nifty Capital Markets ETF",
         "Nifty Capital Markets index"
+      ],
+      "constituents": [
+        "HDFCAMC.NS",
+        "BSE.NS",
+        "MCX.NS",
+        "ANGELONE.NS",
+        "CDSL.NS",
+        "KFINTECH.NS",
+        "NUVAMA.NS",
+        "360ONE.NS",
+        "MOTILALOFS.NS",
+        "IEX.NS",
+        "CAMS.NS",
+        "NAM-INDIA.NS",
+        "ABSLAMC.NS",
+        "UTIAMC.NS"
       ]
     },
     {
@@ -334,6 +512,32 @@
       ],
       "search": [
         "Nifty Services Sector index"
+      ],
+      "constituents": [
+        "HDFCBANK.NS",
+        "ICICIBANK.NS",
+        "INFY.NS",
+        "TCS.NS",
+        "SBIN.NS",
+        "BHARTIARTL.NS",
+        "AXISBANK.NS",
+        "KOTAKBANK.NS",
+        "HCLTECH.NS",
+        "WIPRO.NS",
+        "TECHM.NS",
+        "BAJFINANCE.NS",
+        "BAJAJFINSV.NS",
+        "SBILIFE.NS",
+        "HDFCLIFE.NS",
+        "APOLLOHOSP.NS",
+        "INDIGO.NS",
+        "ADANIPORTS.NS",
+        "LTIM.NS",
+        "SHRIRAMFIN.NS",
+        "JIOFIN.NS",
+        "MAXHEALTH.NS",
+        "CONCOR.NS",
+        "IRCTC.NS"
       ]
     }
   ]

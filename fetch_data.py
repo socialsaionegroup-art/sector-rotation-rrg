@@ -335,6 +335,190 @@ def freshness_cutoff(days_back=10):
     return (datetime.now() - timedelta(days=days_back)).strftime("%Y-%m-%d")
 
 
+
+# ------------------------------ source: rebuild an index from its members
+#
+# Yahoo stopped updating several ^CNX... index symbols in July 2026 but still
+# serves the individual NSE stocks. So an index can be rebuilt from its
+# constituents. The problem is the weights: real Nifty indices are free-float
+# market-cap weighted with capping rules, and the free-float factors are not
+# public here.
+#
+# For an index that HAS history (the frozen ones) we don't need them. Fit the
+# weights against the index's own past daily returns by non-negative least
+# squares, then carry those weights forward. Two things fall out of that:
+# members that were never really in the index get ~zero weight, so an
+# imperfect member list is self-correcting; and the fit quality is measurable,
+# so a bad reconstruction announces itself instead of quietly lying.
+#
+# For an index with NO history there is nothing to fit against. Those fall
+# back to equal weights and are flagged as unverified.
+
+
+def nnls(X, y, iters=300):
+    """min ||Xw - y||^2 subject to w >= 0, by coordinate descent."""
+    n = len(X[0])
+    XtX = [[0.0] * n for _ in range(n)]
+    Xty = [0.0] * n
+    for row, yv in zip(X, y):
+        for a in range(n):
+            ra = row[a]
+            if ra:
+                Xty[a] += ra * yv
+                for b in range(a, n):
+                    if row[b]:
+                        XtX[a][b] += ra * row[b]
+    for a in range(n):
+        for b in range(a):
+            XtX[a][b] = XtX[b][a]
+
+    w = [0.0] * n
+    for _ in range(iters):
+        delta = 0.0
+        for i in range(n):
+            d = XtX[i][i]
+            if d <= 1e-15:
+                w[i] = 0.0
+                continue
+            acc = Xty[i]
+            row = XtX[i]
+            for j in range(n):
+                if j != i and w[j]:
+                    acc -= row[j] * w[j]
+            new = max(0.0, acc / d)
+            delta = max(delta, abs(new - w[i]))
+            w[i] = new
+        if delta < 1e-12:
+            break
+    return w
+
+
+def _returns_matrix(members, dates):
+    """Per-date fractional returns for each member; None where unknown."""
+    rets = {}
+    for sym, px in members.items():
+        col = [None] * len(dates)
+        prev = None
+        for i, d in enumerate(dates):
+            v = px.get(d)
+            if v is not None and prev is not None and prev > 0:
+                col[i] = v / prev - 1.0
+            if v is not None:
+                prev = v
+        rets[sym] = col
+    return rets
+
+
+def build_composite(tickers, days, anchor=None, label=""):
+    """anchor: (dates, closes) of the real index, if we have any of it."""
+    members = {}
+    for t in tickers:
+        got, err = fetch_yahoo(t, days)
+        if got:
+            members[t] = dict(zip(got[0], got[1]))
+            vlog("  member %-16s %d bars to %s" % (t, len(got[0]), got[0][-1]))
+        else:
+            vlog("  member %-16s unavailable (%s)" % (t, err))
+        time.sleep(0.12)
+
+    if len(members) < 3:
+        return None, "only %d members downloaded" % len(members)
+
+    all_dates = set()
+    for px in members.values():
+        all_dates |= set(px)
+    dates = sorted(all_dates)
+    if len(dates) < 250:
+        return None, "only %d dates across members" % len(dates)
+
+    syms = sorted(members)
+    rets = _returns_matrix(members, dates)
+
+    weights = None
+    fit = None
+    if anchor:
+        a_px = dict(zip(anchor[0], anchor[1]))
+        rows, ys, idxs = [], [], []
+        prev = None
+        for i, d in enumerate(dates):
+            v = a_px.get(d)
+            if v is not None and prev is not None and prev > 0:
+                row = [rets[s][i] for s in syms]
+                if sum(1 for x in row if x is not None) >= max(3, len(syms) * 0.6):
+                    rows.append([x if x is not None else 0.0 for x in row])
+                    ys.append(v / prev - 1.0)
+                    idxs.append(i)
+            if v is not None:
+                prev = v
+
+        if len(rows) >= 200:
+            w = nnls(rows, ys)
+            tot = sum(w)
+            if tot > 1e-9:
+                weights = {s: wi / tot for s, wi in zip(syms, w)}
+                # how well do those weights reproduce the index we DO have?
+                pred = [sum(r[j] * w[j] for j in range(len(syms))) for r in rows]
+                n = len(ys)
+                my, mp = sum(ys) / n, sum(pred) / n
+                cov = sum((a - my) * (b - mp) for a, b in zip(ys, pred))
+                va = sum((a - my) ** 2 for a in ys)
+                vb = sum((b - mp) ** 2 for b in pred)
+                corr = cov / ((va * vb) ** 0.5) if va > 0 and vb > 0 else 0.0
+                resid = sum((a - b) ** 2 for a, b in zip(ys, pred)) / n
+                fit = {"days": n, "corr": round(corr, 4),
+                       "tracking_error_bps_per_day": round((resid ** 0.5) * 1e4, 1),
+                       "top": sorted(((round(v, 4), s) for s, v in weights.items()
+                                      if v > 0.01), reverse=True)[:6]}
+
+    if weights is None:
+        weights = {s: 1.0 / len(syms) for s in syms}
+
+    def composite_return(i):
+        num = den = 0.0
+        for s in syms:
+            r = rets[s][i]
+            if r is None:
+                continue
+            wv = weights[s]
+            num += wv * r
+            den += wv
+        return (num / den) if den > 1e-9 else None
+
+    # Splice: keep every real index value we have, synthesise only the tail.
+    if anchor:
+        a_dates, a_closes = anchor
+        out_d, out_c = list(a_dates), list(a_closes)
+        last = a_dates[-1]
+        level = a_closes[-1]
+        for i, d in enumerate(dates):
+            if d <= last:
+                continue
+            r = composite_return(i)
+            if r is None:
+                continue
+            level *= (1.0 + r)
+            out_d.append(d)
+            out_c.append(round(level, 4))
+        if len(out_d) == len(a_dates):
+            return None, "no member data after the index went stale"
+        return (out_d, out_c), {"mode": "spliced", "from": last,
+                                "added": len(out_d) - len(a_dates),
+                                "members": len(syms), "fit": fit}
+
+    level = 1000.0
+    out_d, out_c = [], []
+    for i, d in enumerate(dates):
+        r = composite_return(i) if i else 0.0
+        if r is None:
+            continue
+        level *= (1.0 + r)
+        out_d.append(d)
+        out_c.append(round(level, 4))
+    if len(out_d) < 250:
+        return None, "composite only %d bars" % len(out_d)
+    return (out_d, out_c), {"mode": "equal-weight", "members": len(syms), "fit": None}
+
+
 # ------------------------------------------------------------------ main
 def main():
     with open(UNIVERSE_PATH, "r", encoding="utf-8") as f:
@@ -347,8 +531,10 @@ def main():
         "generated_at": datetime.now(timezone.utc).astimezone().isoformat(timespec="seconds"),
         "source": "NSE India historical index API, with Yahoo Finance as fallback",
         "series": {}, "meta": [], "failed": [], "stale": [], "discovered": [],
+        "reconstructed": {},
     }
 
+    composites = {}
     log("Fetching %d instruments (~%d days).  NSE=%s  Yahoo=%s\n"
         % (len(instruments), days, "on" if USE_NSE else "off", "on" if USE_YAHOO else "off"))
 
@@ -402,6 +588,33 @@ def main():
                 if any(c[0][-1] >= fresh for c in cands):
                     break
 
+        # ---- last resort: rebuild the index from its constituent stocks
+        fresh = freshness_cutoff()
+        best_now = max((c[0][-1] for c in cands), default="")
+        if inst.get("constituents") and best_now < fresh:
+            anchor = None
+            if cands:
+                cands.sort(key=lambda c: (c[0][-1], len(c[0])), reverse=True)
+                anchor = (cands[0][0], cands[0][1])
+                log("       ...rebuilding from %d constituents, splicing onto the real"
+                    " index after %s" % (len(inst["constituents"]), anchor[0][-1]))
+            else:
+                log("       ...no index feed at all; building an equal-weight"
+                    " basket of %d constituents" % len(inst["constituents"]))
+            built, info = build_composite(inst["constituents"], days, anchor, inst["name"])
+            if built:
+                cands = [(built[0], built[1], "composite")]
+                composites[inst["id"]] = info
+                if info.get("fit"):
+                    f = info["fit"]
+                    log("       fit vs the real index: corr %.3f over %d days,"
+                        " tracking error %.1f bps/day"
+                        % (f["corr"], f["days"], f["tracking_error_bps_per_day"]))
+                    vlog("top weights: " + ", ".join("%s %.1f%%" % (sym, w * 100)
+                                                     for w, sym in f["top"]))
+            else:
+                log("       ...reconstruction failed: %s" % info)
+
         if not cands:
             out["failed"].append({"id": inst["id"], "name": inst["name"],
                                   "tried": ([inst["nse"]] if inst.get("nse") else [])
@@ -414,12 +627,23 @@ def main():
         dates, closes, src = cands[0]
 
         out["series"][inst["id"]] = {"dates": dates, "closes": closes}
-        out["meta"].append({
+        entry = {
             "id": inst["id"], "name": inst["name"], "short": inst.get("short", inst["id"]),
             "sector": bool(inst.get("sector", True)), "benchmark": bool(inst.get("benchmark", False)),
             "symbol": src, "bars": len(closes), "last_date": dates[-1], "last_close": closes[-1],
-        })
-        if src not in inst.get("symbols", []) and not src.startswith("NSE:"):
+        }
+        if src == "composite":
+            info = composites[inst["id"]]
+            entry["reconstructed"] = info["mode"]
+            entry["members"] = info["members"]
+            entry["symbol"] = "rebuilt from %d stocks" % info["members"]
+            if info.get("fit"):
+                entry["fit_corr"] = info["fit"]["corr"]
+                entry["spliced_from"] = info.get("from")
+            out["reconstructed"][inst["id"]] = info
+        out["meta"].append(entry)
+        if (src not in inst.get("symbols", []) and not src.startswith("NSE:")
+                and src != "composite"):
             out["discovered"].append({"id": inst["id"], "name": inst["name"], "symbol": src})
         others = ", ".join("%s→%s" % (c[2], c[0][-1]) for c in cands[1:])
         log("  OK   %-24s %-22s %5d bars  last %s%s"
@@ -453,6 +677,16 @@ def main():
         for d in out["discovered"]:
             log("   %-24s %s" % (d["name"], d["symbol"]))
         log("   If one looks wrong, put the right symbol in universe.json.")
+    if out["reconstructed"]:
+        log("REBUILT FROM CONSTITUENTS — these are proxies, not the published index:")
+        for iid, info in out["reconstructed"].items():
+            nm = next(m["name"] for m in out["meta"] if m["id"] == iid)
+            if info.get("fit"):
+                log("   %-24s %d members, spliced after %s, corr %.3f with the real index"
+                    % (nm, info["members"], info.get("from"), info["fit"]["corr"]))
+            else:
+                log("   %-24s %d members, equal-weight, NO history to check against"
+                    % (nm, info["members"]))
     if out["stale"]:
         log("STALE (last update shown) — these are excluded from the chart:")
         for s in out["stale"]:

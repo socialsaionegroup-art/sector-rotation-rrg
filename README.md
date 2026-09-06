@@ -189,6 +189,52 @@ python fetch_data.py --no-nse    # Yahoo only
 python fetch_data.py --no-yahoo  # NSE only
 ```
 
+## Indices rebuilt from their constituents
+
+Yahoo stopped updating several `^CNX…` index symbols in July 2026, and never
+carried the newer ones at all. It does still serve the individual NSE stocks,
+so those indices are rebuilt from their members. Anything rebuilt this way is
+marked with a **~** in the chart, the legend and the table, and listed as a
+**proxy** in the sources panel. It is not the published index and the app never
+pretends otherwise.
+
+The interesting problem is the weights. Real Nifty indices are free-float
+market-cap weighted with capping rules, and the free-float factors aren't public
+here. Two cases:
+
+**The index has past data** (Realty, Energy, Media, PSE, Commodities, Services).
+Then the weights don't need to be looked up — they can be *fitted*. The fetcher
+solves for the non-negative weights that best reproduce the index's own past
+daily returns, then carries them forward and splices the result onto the real
+history at the point the feed died. Every value before that date is the genuine
+index; only the tail is synthetic.
+
+Two useful properties fall out of fitting rather than guessing:
+
+- A member that was never really in the index gets a weight of ~0, so an
+  imperfect constituent list largely corrects itself. You can list generously.
+- The fit is measurable. The **correlation** shown against each proxy is how
+  well those weights reproduce the index over the period where both exist.
+  On test data: a correct member list scores ~1.00; missing 15% of the index
+  weight scores 0.99 and drifts ~0.2% over six weeks; missing half the index
+  scores 0.90 and drifts ~0.6%. So a bad list announces itself instead of
+  quietly lying. **Treat anything below ~0.95 as a constituent list that needs
+  fixing.**
+
+**The index has no past data at all** (Consumer Durables, Defence, Chemicals,
+Capital Markets). There is nothing to fit against, so those use equal weights
+and are labelled *unverified*. They show the sector's broad direction, but an
+equal-weight basket genuinely differs from a cap-weighted index, and no number
+in the app can tell you by how much. Weigh them accordingly.
+
+Nifty Smallcap 100 is deliberately not rebuilt — 100 members is a list nobody
+will maintain correctly. It looks for a Smallcap 250 ETF instead, which is a
+different index; if none is found it stays excluded.
+
+Constituent lists live in `universe.json` under `constituents`. They go stale as
+indices rebalance — when a correlation starts drifting down, that's the signal
+to update the list.
+
 ## Changing what's tracked
 
 Edit **`universe.json`** and re-run. Each entry has an `nse` index name (the
