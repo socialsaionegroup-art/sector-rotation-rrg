@@ -116,6 +116,15 @@ function median(a) {
   return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2;
 }
 
+/** A series we rebuilt from constituent stocks rather than read from a feed.
+ *  Marked everywhere it appears — it is a proxy, and the chart should never
+ *  let it pass as the published index. */
+function isProxy(id) {
+  const m = S.meta.find(x => x.id === id);
+  return !!(m && m.reconstructed);
+}
+const proxyMark = id => isProxy(id) ? '~' : '';
+
 function quadrantOf(ratio, mom) {
   if (ratio >= 100) return mom >= 100 ? 'lead' : 'weak';
   return mom >= 100 ? 'imp' : 'lag';
@@ -408,7 +417,7 @@ function draw() {
     ctx.beginPath(); ctx.arc(hx, hy, hoverId === id ? 7 : 5.5, 0, 7); ctx.stroke();
 
     const m = S.meta.find(x => x.id === id);
-    labels.push({ text: m.short, x: hx, y: hy, c, dim });
+    labels.push({ text: proxyMark(id) + m.short, x: hx, y: hy, c, dim });
     ctx.globalAlpha = 1;
   }
 
@@ -471,7 +480,10 @@ function renderLegend() {
     row.className = 'lg' + (S.hidden.has(m.id) ? ' off' : '');
     row.innerHTML =
       `<span class="sw" style="background:${S.colors[m.id]}"></span>` +
-      `<span class="nm" title="${m.name} · ${m.symbol}">${m.name}</span>` +
+      `<span class="nm" title="${m.name} · ${m.symbol}${m.reconstructed
+          ? ' · proxy rebuilt from ' + m.members + ' stocks'
+            + (m.fit_corr ? ', correlation ' + m.fit_corr + ' with the real index' : '')
+          : ''}">${m.name}${m.reconstructed ? '<i class="px">~</i>' : ''}</span>` +
       (q ? `<span class="q" style="color:var(${QUADS[q].v})">${QUADS[q].name.slice(0,4).toUpperCase()}</span>` : '');
     row.onclick = () => { S.hidden.has(m.id) ? S.hidden.delete(m.id) : S.hidden.add(m.id); renderAll(); };
     row.onmouseenter = () => { S.hover = { id: m.id }; draw(); };
@@ -534,7 +546,8 @@ function renderTable() {
     const sign = v => v === null ? '' : (v >= 0 ? 'up' : 'down');
     const pm = (v, d=2) => v === null ? '—' : (v >= 0 ? '+' : '') + v.toFixed(d);
     tr.innerHTML =
-      `<td><span class="dot" style="background:${r.color}"></span>${r.name}</td>` +
+      `<td><span class="dot" style="background:${r.color}"></span>${r.name}` +
+      `${isProxy(r.id) ? '<i class="px" title="Rebuilt from constituent stocks, not the published index">~</i>' : ''}</td>` +
       `<td><span class="badge ${r.quad}">${QUADS[r.quad].name}</span></td>` +
       `<td class="num">${fmt(r.ratio)}</td>` +
       `<td class="num">${fmt(r.mom)}</td>` +
@@ -600,7 +613,11 @@ function showTip(h) {
     `<div class="r"><span>RS-Ratio</span><b>${fmt(h.p.ratio)}</b></div>` +
     `<div class="r"><span>RS-Mom</span><b>${fmt(h.p.mom)}</b></div>` +
     `<div class="r"><span>Heading</span><b>${rows.heading === null || rows.heading === undefined ? '—' : compass(rows.heading)}</b></div>` +
-    `<div class="r"><span>Date</span><b>${h.p.d}</b></div>`;
+    `<div class="r"><span>Date</span><b>${h.p.d}</b></div>` +
+    (m.reconstructed
+      ? `<div class="r px-note">proxy from ${m.members} stocks` +
+        (m.fit_corr ? ` · corr ${m.fit_corr}` : '') + `</div>`
+      : '');
   tip.hidden = false;
   const wrap = cv.parentElement;
   const tw = tip.offsetWidth, th = tip.offsetHeight;
@@ -681,11 +698,17 @@ function renderStamp(data) {
       ? a.name.localeCompare(b.name) : (a.last_date < b.last_date ? -1 : 1))
     .map(m => {
       const bad = stale.has(m.id);
-      return `<tr class="${bad ? 'bad' : ''}"><td>${m.name}</td>` +
+      const note = bad ? 'stale — not plotted'
+        : m.reconstructed === 'spliced'
+          ? `proxy after ${niceDate(m.spliced_from)} · corr ${m.fit_corr}`
+        : m.reconstructed
+          ? 'proxy, equal-weight, unverified'
+        : '';
+      return `<tr class="${bad ? 'bad' : m.reconstructed ? 'proxy' : ''}"><td>${m.name}</td>` +
              `<td class="sym">${m.symbol}</td>` +
              `<td class="num">${niceDate(m.last_date)}</td>` +
              `<td class="num">${m.bars}</td>` +
-             `<td>${bad ? 'stale — not plotted' : ''}</td></tr>`;
+             `<td>${note}</td></tr>`;
     }).join('');
   const missing = (data.failed || []).map(f =>
     `<tr class="bad"><td>${f.name}</td><td class="sym">—</td>` +
@@ -694,7 +717,10 @@ function renderStamp(data) {
   $('#sources').innerHTML =
     `<h3>Where every line comes from</h3>
      <p>End-of-day closes, downloaded once and cached. Nothing here is live or
-        intraday — re-run the fetcher (or press <b>Refresh data</b>) to move it forward.</p>
+        intraday — re-run the fetcher (or press <b>Refresh data</b>) to move it forward.
+        Rows marked <b>proxy</b> are rebuilt from constituent stocks because no feed
+        publishes that index any more; where the index has past data the weights are
+        fitted against it and the correlation shown is how well they reproduce it.</p>
      <div class="stbl"><table>
        <thead><tr><th>Index</th><th>Source symbol</th><th class="num">Last bar</th>
        <th class="num">Bars</th><th></th></tr></thead>

@@ -255,3 +255,11 @@ td .dot{width:8px;height:8px;border-radius:3px;display:inline-block;margin-right
 .warn summary::before{content:"▸";color:var(--weak);font-size:11px}
 .warn[open] summary::before{content:"▾"}
 .warnbody{margin-top:7px}
+
+.px{
+  font-style:normal;color:var(--weak);font-weight:700;margin-left:4px;
+  cursor:help;font-size:13px;
+}
+.px-note{margin-top:5px;padding-top:5px;border-top:1px solid var(--line);
+  color:var(--weak);font-size:11.5px}
+.sources tr.proxy td.sym{color:var(--weak)}
