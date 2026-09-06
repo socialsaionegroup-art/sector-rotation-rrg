@@ -1,0 +1,7 @@
+# Keep LF endings for anything a Linux runner executes.
+# A CRLF shell block inside a workflow would fail there with $'\r': command not found.
+*.yml  text eol=lf
+*.yaml text eol=lf
+*.py   text eol=lf
+*.sh   text eol=lf
+*.json text eol=lf

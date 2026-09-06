@@ -1,0 +1,90 @@
+name: Refresh prices
+
+# Runs on GitHub's machines, not yours. The PC can stay switched off.
+on:
+  schedule:
+    # 11:05 UTC = 16:35 IST, weekdays — about an hour after the NSE close,
+    # which is long enough for the end-of-day closes to be published.
+    # (GitHub often starts scheduled jobs a few minutes late. That is fine
+    #  here: we want a daily bar, not a timestamp.)
+    - cron: "5 11 * * 1-5"
+  # Adds a "Run workflow" button on the Actions tab — usable from a phone.
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: refresh-prices
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Fetch prices and rebuild docs/
+        run: |
+          # NSE blocks datacentre IPs outright, so don't waste the runner's
+          # time on it here — Yahoo plus the symbol search does the work.
+          # Yahoo occasionally rate-limits cloud IPs, hence the retries.
+          for attempt in 1 2 3; do
+            echo "::group::Attempt $attempt"
+            if python publish.py --no-push --no-nse --verbose; then
+              echo "::endgroup::"
+              exit 0
+            fi
+            echo "::endgroup::"
+            echo "Attempt $attempt failed; waiting before retry."
+            sleep 90
+          done
+          echo "All attempts failed — leaving the published data untouched."
+          exit 1
+
+      - name: Publish if anything changed
+        run: |
+          git config user.name  "rrg-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs data
+          if git diff --cached --quiet; then
+            echo "No new bar (holiday, or already current) — nothing to publish."
+            exit 0
+          fi
+          LAST=$(python -c "import json;print(max(m['last_date'] for m in json.load(open('data/prices.json'))['meta']))")
+          git commit -m "Prices to $LAST (auto)"
+          git push
+
+      - name: Summary
+        if: always()
+        run: |
+          if [ -f data/prices.json ]; then
+            python - <<'PY' >> "$GITHUB_STEP_SUMMARY"
+          import json
+          d = json.load(open("data/prices.json"))
+          meta = d["meta"]
+          newest = max(m["last_date"] for m in meta)
+          stale = [m for m in meta if m["last_date"] < newest]
+          print("## Prices to **%s** — %d indices\n" % (newest, len(meta)))
+          if d.get("discovered"):
+              print("### Found by search — check these are the right instruments\n")
+              for x in d["discovered"]:
+                  print("- %s -> `%s`" % (x["name"], x["symbol"]))
+              print("")
+          if stale:
+              print("### Behind the newest bar\n")
+              for m in sorted(stale, key=lambda m: m["last_date"]):
+                  print("- %s (`%s`) — %s" % (m["name"], m["symbol"], m["last_date"]))
+              print("")
+          if d.get("failed"):
+              print("### No source found\n")
+              for f in d["failed"]:
+                  print("- %s" % f["name"])
+          PY
+          fi

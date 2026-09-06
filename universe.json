@@ -1,0 +1,340 @@
+{
+  "_comment": "'nse' is the index name as NSE publishes it (primary source). 'symbols' are Yahoo Finance fallbacks - every one is tried and the FRESHEST wins. 'benchmark': true makes an entry selectable as the benchmark; 'sector': true plots it.",
+  "history_days": 1500,
+  "instruments": [
+    {
+      "id": "NIFTY50",
+      "name": "Nifty 50",
+      "short": "NIFTY",
+      "benchmark": true,
+      "sector": false,
+      "nse": "NIFTY 50",
+      "symbols": [
+        "^NSEI",
+        "NIFTYBEES.NS"
+      ]
+    },
+    {
+      "id": "BANKNIFTY",
+      "name": "Nifty Bank",
+      "short": "BANK",
+      "benchmark": true,
+      "sector": true,
+      "nse": "NIFTY BANK",
+      "symbols": [
+        "^NSEBANK",
+        "BANKBEES.NS"
+      ]
+    },
+    {
+      "id": "FINNIFTY",
+      "name": "Nifty Fin Services",
+      "short": "FINSRV",
+      "benchmark": true,
+      "sector": true,
+      "nse": "NIFTY FINANCIAL SERVICES",
+      "symbols": [
+        "FINIETF.NS",
+        "NIFTY_FIN_SERVICE.NS"
+      ]
+    },
+    {
+      "id": "MIDCAP",
+      "name": "Nifty Midcap 100",
+      "short": "MIDCAP",
+      "benchmark": true,
+      "sector": true,
+      "nse": "NIFTY MIDCAP 100",
+      "symbols": [
+        "MIDCAPETF.NS",
+        "NIFTY_MIDCAP_100.NS"
+      ]
+    },
+    {
+      "id": "SENSEX",
+      "name": "BSE Sensex",
+      "short": "SENSEX",
+      "benchmark": true,
+      "sector": false,
+      "symbols": [
+        "^BSESN"
+      ]
+    },
+    {
+      "id": "IT",
+      "name": "Nifty IT",
+      "short": "IT",
+      "sector": true,
+      "nse": "NIFTY IT",
+      "symbols": [
+        "^CNXIT",
+        "ITBEES.NS"
+      ]
+    },
+    {
+      "id": "AUTO",
+      "name": "Nifty Auto",
+      "short": "AUTO",
+      "sector": true,
+      "nse": "NIFTY AUTO",
+      "symbols": [
+        "^CNXAUTO",
+        "AUTOBEES.NS",
+        "AUTOIETF.NS"
+      ]
+    },
+    {
+      "id": "PHARMA",
+      "name": "Nifty Pharma",
+      "short": "PHARMA",
+      "sector": true,
+      "nse": "NIFTY PHARMA",
+      "symbols": [
+        "^CNXPHARMA",
+        "PHARMABEES.NS"
+      ]
+    },
+    {
+      "id": "FMCG",
+      "name": "Nifty FMCG",
+      "short": "FMCG",
+      "sector": true,
+      "nse": "NIFTY FMCG",
+      "symbols": [
+        "^CNXFMCG",
+        "FMCGIETF.NS"
+      ]
+    },
+    {
+      "id": "METAL",
+      "name": "Nifty Metal",
+      "short": "METAL",
+      "sector": true,
+      "nse": "NIFTY METAL",
+      "symbols": [
+        "^CNXMETAL",
+        "METALIETF.NS"
+      ],
+      "search": [
+        "Nifty Metal ETF"
+      ]
+    },
+    {
+      "id": "REALTY",
+      "name": "Nifty Realty",
+      "short": "REALTY",
+      "sector": true,
+      "nse": "NIFTY REALTY",
+      "symbols": [
+        "^CNXREALTY"
+      ],
+      "search": [
+        "Nifty Realty index",
+        "Nifty Realty ETF"
+      ]
+    },
+    {
+      "id": "ENERGY",
+      "name": "Nifty Energy",
+      "short": "ENERGY",
+      "sector": true,
+      "nse": "NIFTY ENERGY",
+      "symbols": [
+        "^CNXENERGY"
+      ],
+      "search": [
+        "Nifty Energy ETF",
+        "Nifty Energy index"
+      ]
+    },
+    {
+      "id": "MEDIA",
+      "name": "Nifty Media",
+      "short": "MEDIA",
+      "sector": true,
+      "nse": "NIFTY MEDIA",
+      "symbols": [
+        "^CNXMEDIA"
+      ],
+      "search": [
+        "Nifty Media index",
+        "Nifty Media ETF"
+      ]
+    },
+    {
+      "id": "PSUBANK",
+      "name": "Nifty PSU Bank",
+      "short": "PSUBNK",
+      "sector": true,
+      "nse": "NIFTY PSU BANK",
+      "symbols": [
+        "^CNXPSUBANK",
+        "PSUBNKBEES.NS"
+      ]
+    },
+    {
+      "id": "PVTBANK",
+      "name": "Nifty Private Bank",
+      "short": "PVTBNK",
+      "sector": true,
+      "nse": "NIFTY PVT BANK",
+      "symbols": [
+        "PVTBANIETF.NS",
+        "NIFTY_PVT_BANK.NS"
+      ]
+    },
+    {
+      "id": "INFRA",
+      "name": "Nifty Infrastructure",
+      "short": "INFRA",
+      "sector": true,
+      "nse": "NIFTY INFRASTRUCTURE",
+      "symbols": [
+        "^CNXINFRA",
+        "INFRABEES.NS"
+      ],
+      "search": [
+        "Nifty Infrastructure ETF"
+      ]
+    },
+    {
+      "id": "PSE",
+      "name": "Nifty PSE",
+      "short": "PSE",
+      "sector": true,
+      "nse": "NIFTY PSE",
+      "symbols": [
+        "^CNXPSE"
+      ],
+      "search": [
+        "Nifty PSE ETF",
+        "Nifty PSE index"
+      ]
+    },
+    {
+      "id": "CONSUM",
+      "name": "Nifty Consumption",
+      "short": "CONSUM",
+      "sector": true,
+      "nse": "NIFTY INDIA CONSUMPTION",
+      "symbols": [
+        "^CNXCONSUM",
+        "CONSUMBEES.NS"
+      ]
+    },
+    {
+      "id": "COMMOD",
+      "name": "Nifty Commodities",
+      "short": "COMMOD",
+      "sector": true,
+      "nse": "NIFTY COMMODITIES",
+      "symbols": [
+        "^CNXCMDT"
+      ],
+      "search": [
+        "Nifty Commodities index"
+      ]
+    },
+    {
+      "id": "HEALTH",
+      "name": "Nifty Healthcare",
+      "short": "HEALTH",
+      "sector": true,
+      "nse": "NIFTY HEALTHCARE INDEX",
+      "symbols": [
+        "HEALTHY.NS",
+        "NIFTY_HEALTHCARE.NS"
+      ]
+    },
+    {
+      "id": "CONSDUR",
+      "name": "Nifty Cons. Durables",
+      "short": "CONSDUR",
+      "sector": true,
+      "nse": "NIFTY CONSUMER DURABLES",
+      "symbols": [
+        "NIFTY_CONSR_DURBL.NS"
+      ],
+      "search": [
+        "Nifty Consumer Durables ETF",
+        "Nifty India Consumer Durables"
+      ]
+    },
+    {
+      "id": "OILGAS",
+      "name": "Nifty Oil & Gas",
+      "short": "OIL&GAS",
+      "sector": true,
+      "nse": "NIFTY OIL & GAS",
+      "symbols": [
+        "OILIETF.NS",
+        "NIFTY_OIL_AND_GAS.NS"
+      ],
+      "search": [
+        "Nifty Oil and Gas ETF"
+      ]
+    },
+    {
+      "id": "SMALLCAP",
+      "name": "Nifty Smallcap 100",
+      "short": "SMLCAP",
+      "sector": true,
+      "nse": "NIFTY SMLCAP 100",
+      "symbols": [
+        "^CNXSC"
+      ],
+      "search": [
+        "Nifty Smallcap 250 ETF",
+        "Nifty Smallcap 100 index"
+      ]
+    },
+    {
+      "id": "DEFENCE",
+      "name": "Nifty India Defence",
+      "short": "DEFENCE",
+      "sector": true,
+      "nse": "NIFTY INDIA DEFENCE",
+      "symbols": [],
+      "search": [
+        "Nifty India Defence ETF"
+      ]
+    },
+    {
+      "id": "CHEM",
+      "name": "Nifty Chemicals",
+      "short": "CHEM",
+      "sector": true,
+      "nse": "NIFTY CHEMICALS",
+      "symbols": [],
+      "search": [
+        "Nifty Chemicals index",
+        "Nifty Chemicals ETF"
+      ]
+    },
+    {
+      "id": "CAPMKT",
+      "name": "Nifty Capital Markets",
+      "short": "CAPMKT",
+      "sector": true,
+      "nse": "NIFTY CAPITAL MARKETS",
+      "symbols": [],
+      "search": [
+        "Nifty Capital Markets ETF",
+        "Nifty Capital Markets index"
+      ]
+    },
+    {
+      "id": "SERVICES",
+      "name": "Nifty Services Sector",
+      "short": "SERVICE",
+      "sector": true,
+      "nse": "NIFTY SERVICES SECTOR",
+      "symbols": [
+        "^CNXSERVICE"
+      ],
+      "search": [
+        "Nifty Services Sector index"
+      ]
+    }
+  ]
+}

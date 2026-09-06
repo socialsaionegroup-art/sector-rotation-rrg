@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sector Rotation — RRG</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <span class="mark"></span>
+    <div>
+      <h1>Sector Rotation <span class="dim">/ RRG</span></h1>
+      <p class="sub" id="subtitle">Relative Rotation Graph — NSE sectoral indices</p>
+    </div>
+  </div>
+  <div class="topbar-right">
+    <button class="stamp" id="stamp" title="Click for the exact source and last bar of every index"></button>
+    <div id="sources" class="sources" hidden></div>
+    <button class="btn ghost" id="refreshBtn" title="Re-download prices from Yahoo Finance">Refresh data</button>
+    <button class="btn ghost" id="themeBtn" title="Toggle light / dark">◐</button>
+  </div>
+</header>
+
+<div class="controls">
+  <label class="ctl">
+    <span>Benchmark</span>
+    <select id="benchmark"></select>
+  </label>
+
+  <label class="ctl">
+    <span>Timeframe</span>
+    <div class="seg" id="timeframe">
+      <button data-v="daily" class="on">Daily</button>
+      <button data-v="weekly">Weekly</button>
+    </div>
+  </label>
+
+  <label class="ctl">
+    <span>Tail length</span>
+    <div class="seg" id="tail">
+      <button data-v="4">4</button>
+      <button data-v="6">6</button>
+      <button data-v="8" class="on">8</button>
+      <button data-v="12">12</button>
+      <button data-v="16">16</button>
+    </div>
+  </label>
+
+  <label class="ctl grow">
+    <span>Date <b id="dateLabel">—</b></span>
+    <div class="scrub">
+      <button class="btn play" id="playBtn" title="Animate">▶</button>
+      <input type="range" id="scrub" min="0" max="0" value="0">
+      <button class="btn ghost sm" id="liveBtn" title="Jump to latest">Latest</button>
+    </div>
+  </label>
+</div>
+
+<main class="layout">
+  <section class="chartcard">
+    <div class="chartwrap">
+      <canvas id="rrg"></canvas>
+      <div id="tip" class="tip" hidden></div>
+    </div>
+  </section>
+
+  <aside class="side">
+    <div class="sidehead">
+      <h2>Sectors</h2>
+      <div class="sideactions">
+        <button class="btn ghost sm" id="allBtn">All</button>
+        <button class="btn ghost sm" id="noneBtn">None</button>
+      </div>
+    </div>
+    <div id="legend" class="legend"></div>
+  </aside>
+</main>
+
+<section class="tablecard">
+  <div class="tablehead">
+    <h2>Quadrant readout</h2>
+    <div class="quadkey">
+      <span class="k lead">Leading</span>
+      <span class="k weak">Weakening</span>
+      <span class="k lag">Lagging</span>
+      <span class="k imp">Improving</span>
+    </div>
+  </div>
+  <div class="tscroll">
+    <table id="table">
+      <thead>
+        <tr>
+          <th data-sort="name">Sector</th>
+          <th data-sort="quad">Quadrant</th>
+          <th data-sort="ratio" class="num">RS-Ratio</th>
+          <th data-sort="mom" class="num">RS-Momentum</th>
+          <th data-sort="dratio" class="num">Δ Ratio</th>
+          <th data-sort="dmom" class="num">Δ Mom</th>
+          <th data-sort="heading" class="num">Heading</th>
+          <th data-sort="rel" class="num">Rel. perf<span class="th-sub" id="relHead"></span></th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+</section>
+
+<footer class="foot">
+  <p><b>How to read it.</b> The horizontal axis is <b>RS-Ratio</b> — how a sector is performing relative to the benchmark, normalised so 100 is neutral. The vertical axis is <b>RS-Momentum</b> — the rate of change of that relative strength. Sectors rotate clockwise: Improving → Leading → Weakening → Lagging → Improving. Tails show the last N periods; the dot is the most recent one.</p>
+  <p class="dim small">Prices from Yahoo Finance, daily closes. Educational tool — not investment advice.</p>
+</footer>
+
+<div id="toast" class="toast" hidden></div>
+
+<script src="app.js"></script>
+</body>
+</html>
